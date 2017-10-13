@@ -1,27 +1,19 @@
-#!/usr/bin/env python3
+###
+# Name: Keith, Jianhua 
+# Course: CS510 Fall 2017
+# Assignment: Classwork 5
+# Date: 10-2017
+###
 
-from abc import ABC, abstractmethod
+import numpy as np
+import pandas as pd
 
 
-"""CS510 - CW05 Abstract Base Classes.
-This module provides abstract base classes for CW05.
-Note that such a class does nothing by itself: all functionality
-is just a pass statement as written. Instead, a coder is
-intended to inherit from this class in order to adopt its
-interface. The set of attributes and methods of a class
-that subclasses the abstract base class should provide
-implementations as appropriate.
-The point of such a structure is to guide other programmers
-into good design, so that they can use an interface that
-you expect to exist. This is part of the communal nature of
-coding. Your code does not exist in a vacuum. It exists in
-a community of other coders that are all sharing code with
-each other. Without proper communication on what people 
-expect from each other, it devolves into chaos.
-"""
+from abscplane import AbsComplexPlane
 
-class AbsComplexPlane(ABC):
-    """Abstract base class for complex plane.
+
+class ArrayComplexPlane(AbsComplexPlane):
+    """
     
     A complex plane is a 2D grid of complex numbers, having
     the form (x + y*1j), where 1j is the unit imaginary number in
@@ -73,23 +65,49 @@ class AbsComplexPlane(ABC):
         plane        : stored complex plane implementation
         fs (list[function]) : function sequence to transform plane
     """ 
-    
-    # Class attributes, to be set during an __init__
-    # The six resolution parameters should be floats
-    xmin  = NotImplemented
-    xmax  = NotImplemented
-    xlen  = NotImplemented
-    ymin  = NotImplemented
-    ymax  = NotImplemented
-    ylen  = NotImplemented
-    # The implementation type of plane is up to the user
-    plane = NotImplemented
-    # fs should be a list of functions, initialized to be empty
-    fs    = NotImplemented
-    
-    # The @abstractmethod "decorator" forces all subclasses
-    # to provide implementations for the following method
-    @abstractmethod
+     
+    def __init__(self, xmin, xmax, xlen, ymin, ymax, ylen):
+        self.xmin = xmin
+        self.xmax = xmax
+        self.xlen = xlen
+        self.ymin = ymin
+        self.ymax = ymax
+        self.ylen = ylen
+        self.fs =[]
+        self.__initplane__() #init plane 
+   
+    def __initplane__(self):
+        '''
+        init the complex plane by average distance of X and Y
+        '''
+        
+        
+        ##use numpy to add the 2D grid in an array
+        x=np.linspace(self.xmin,self.xmax,self.xlen)
+        y=np.linspace(self.ymin,self.ymax,self.ylen)
+        xx, yy = np.meshgrid(x,y)
+        self.plane = xx + yy*1j
+        #self.df = pd.DataFrame(xx+(1j)*yy, index=y, columns=x)
+        #print(self.df)
+        #self.df = pd.DataFrame(self.plane, index=y, columns=x) ---not worked
+
+        
+        '''
+        add the 2D grid in a list in list  *****---- use list to generate 2D plane (just for comparsion with numpy)---------------
+        #self.plane = []
+        #xunit = (self.xmax - self.xmin)/(self.xlen - 1)
+        #yunit = (self.ymax - self.ymin)/(self.ylen - 1)
+        #self.plane = [[(self.xmin + i*xunit)+(self.ymin + j*yunit)*1j for i in range(self.xlen)]for j in range(self.ylen)]
+        '''
+        
+        '''
+        The following get a list, not list in list as required
+        for i in range(self.xlen):
+            for j in range(self.ylen):
+                self.plane.append((self.xmin + i*xunit)+(self.ymin + j*yunit)*1j)
+        '''
+       
+
     def refresh(self):
         """Regenerate complex plane.
         Populate self.plane with new points (x + y*1j), using
@@ -98,18 +116,23 @@ class AbsComplexPlane(ABC):
         the attribute fs to an empty list so that no functions 
         are transforming the fresh plane.
         """
-        pass
-    
-    @abstractmethod
-    def apply(self, f):
+        self.__initplane__()
+        self.fs = []
+   
+    def apply(self, fun):
         """Add the function f as the last element of self.fs. 
         Apply f to every point of the plane, so that the resulting
         value of self.plane is the final output of the sequence of
         transformations collected in the list self.fs.
         """
-        pass
+        
+        #self.plane = fun(self.plane)
+        
+        # use numpy vectorize 
+        fv = np.vectorize(fun)
+        self.plane = fv(self.plane)
+        self.fs.append(fun)
     
-    @abstractmethod
     def zoom(self,xmin,xmax,xlen,ymin,ymax,ylen):
         """Reset self.xmin, self.xmax, and self.xlen.
         Also reset self.ymin, self.ymax, and self.ylen.
@@ -119,5 +142,68 @@ class AbsComplexPlane(ABC):
         final output of the sequence of transformations collected in
         the list self.fs.
         """
-        pass
-    
+        #init the plane
+        self.xmin = xmin
+        self.xmax = xmax
+        self.xlen = xlen
+        self.ymin = ymin
+        self.ymax = ymax
+        self.ylen = ylen
+        self.__initplane__()
+        
+        # use numpy vectorize 
+        if len(self.fs) > 0:
+            for fun in self.fs:
+                fv = np.vectorize(fun)
+                self.plane=fv(self.plane)
+        else:
+            print("no fun applied")
+        
+        
+        '''
+        ----------use funtions list-----
+        if len(self.fs) > 0:
+            for fun in self.fs:
+                self.plane = fun(self.plane)
+        else:
+            print("no fun applied")
+
+'''
+'''
+def doubleplane(plane):
+    # mulitple the grids
+    for i in range(len(plane)):
+        for j in range(len(plane[i])):
+            plane[i][j] *=2
+    return plane*2
+
+def powerplane(plane):
+    #mulitple the grids by iteself
+    for i in range(len(plane)):
+        for j in range(len(plane[i])):
+            plane[i][j] =plane[i][j] * plane[i][j] 
+    return plane**2
+'''
+
+'''
+LCP = ArrayComplexPlane(1,4,3,2,5,3)
+print("init plane")
+print(LCP.plane)
+
+print("double fun")
+LCP.apply(doubleplane)
+print(LCP.plane)
+
+print("power fun")
+LCP.apply(powerplane)
+print(LCP.plane)
+
+print("add 2")
+#ff = lambda x: x+(1+1*1j)
+ff = lambda x: x+2
+LCP.apply(ff)
+print(LCP.plane)
+
+
+#print(LCP.fs)
+'''
