@@ -2,7 +2,7 @@
 
 **Author(s):** **CHANGME**
 
-[![Build Status](https://travis-ci.org/chapman-cs510-2017f/cw-07-YOURNAME.svg?branch=master)](https://travis-ci.org/chapman-cs510-2017f/cw-07-YOURNAME)
+[![Build Status](https://travis-ci.org/chapman-cs510-2017f/cw-07-keith_jet.svg?branch=master)](https://travis-ci.org/chapman-cs510-2017f/cw-07-keith_jet)
 
 ## Specification
 
