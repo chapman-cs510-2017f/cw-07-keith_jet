@@ -10,10 +10,10 @@ class JuliaPlane(ArrayComplexPlane):
         
         self.xmin = -2
         self.xmax = 2
-        self.xlen = 6
+        self.xlen = 1000
         self.ymin = -2
         self.ymax = 2
-        self.ylen = 6
+        self.ylen = 1000
         self.fs =[]
         
         self.c=c
@@ -98,11 +98,8 @@ class JuliaPlane(ArrayComplexPlane):
     
     def  show(self):
         plt.imshow(self.plane, interpolation = 'bicubic', cmap =('viridis'), extent = (self.xmin,self.xmax,self.ymin,self.ymax) )
-        plt.legen
-        plt.show()
-        plt.text(0,1.5, self.c, fontsize = 20, color = 'white')
-        plt.text(-0.5,1.5, 'c =', fontsize = 20, color = 'white')
-    
+        plt.title('c='+str(self.c))
+        plt.show()    
 def julia(c, maxnumber):
     '''
     This function returns a function specified by the following algorithm:
